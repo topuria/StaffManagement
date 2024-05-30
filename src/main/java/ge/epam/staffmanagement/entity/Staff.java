@@ -24,7 +24,7 @@ public class Staff {
 
     @ManyToOne
     @JoinColumn(name = "department_id")
-    @JsonIgnoreProperties("staff") // Ignore staff property to break the infinite loop
+    @JsonIgnoreProperties("staff")
     private Department department;
 
     @OneToOne(mappedBy = "staff", cascade = CascadeType.ALL)

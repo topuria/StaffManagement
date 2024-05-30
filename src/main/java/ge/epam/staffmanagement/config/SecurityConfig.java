@@ -39,7 +39,7 @@ public class SecurityConfig {
                 .headers().frameOptions().sameOrigin()
                 .and()
                 .authorizeHttpRequests()
-                .requestMatchers("/", "/authenticate", "/register","/h2-console/**", "/refresh-token", "/login.html", "/register.html", "/css/**", "/js/**").permitAll()
+                .requestMatchers("/", "/authenticate", "/register", "/h2-console/**", "/refresh-token", "/login.html", "/register.html", "/css/**", "/js/**").permitAll()
                 .requestMatchers("/staff.html", "/dashboard.html").permitAll()
                 .anyRequest().authenticated()
                 .and()

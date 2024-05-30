@@ -263,7 +263,7 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
 
-        if (currentStaffId) {
+        if (!currentStaffId) {
             if (image && !['image/jpeg', 'image/png', 'image/gif'].includes(image.type)) {
                 alert('Please upload a valid image file (jpg, png, gif).');
                 return;

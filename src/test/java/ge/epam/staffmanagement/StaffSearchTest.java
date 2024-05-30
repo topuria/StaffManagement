@@ -1,4 +1,4 @@
-package ge.epam.staffmanagement.repo;
+package ge.epam.staffmanagement;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -12,9 +12,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.test.context.ActiveProfiles;
 
 @DataJpaTest
-public class StaffRepositoryTest {
+@ActiveProfiles("test")
+public class StaffSearchTest {
 
     @Autowired
     private StaffRepository staffRepository;
@@ -41,9 +43,9 @@ public class StaffRepositoryTest {
         staff1.setDepartment(department1);
 
         Staff staff2 = new Staff();
-        staff2.setFirstName("mr");
-        staff2.setLastName("Smith");
-        staff2.setEmail("mr.smith@example.com");
+        staff2.setFirstName("Epam");
+        staff2.setLastName("Epam");
+        staff2.setEmail("epam@epam.com");
         staff2.setContactNumber("0987654321");
         staff2.setDepartment(department2);
 
@@ -57,8 +59,8 @@ public class StaffRepositoryTest {
         assertThat(result.getTotalElements()).isEqualTo(1);
         assertThat(result.getContent().get(0).getFirstName()).isEqualTo("Tekla");
 
-        result = staffRepository.searchStaff("smith", PageRequest.of(0, 10));
+        result = staffRepository.searchStaff("epam", PageRequest.of(0, 10));
         assertThat(result.getTotalElements()).isEqualTo(1);
-        assertThat(result.getContent().get(0).getLastName()).isEqualTo("Smith");
+        assertThat(result.getContent().get(0).getLastName()).isEqualTo("Epam");
     }
 }

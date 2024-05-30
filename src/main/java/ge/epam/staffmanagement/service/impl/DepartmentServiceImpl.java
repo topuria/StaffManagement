@@ -28,4 +28,9 @@ public class DepartmentServiceImpl implements DepartmentService {
     public List<Department> getAllDepartments() {
         return departmentRepository.findAll();
     }
+
+    @Override
+    public Department addDepartment(Department department) {
+        return departmentRepository.save(department);
+    }
 }

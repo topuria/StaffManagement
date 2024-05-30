@@ -25,7 +25,7 @@ public class DepartmentController {
     }
 
     @GetMapping("/id")
-    public Department getDepartmentById(int id) {
+    public Department getDepartmentById(long id) {
         return departmentService.getDepartmentById(id);
     }
 }

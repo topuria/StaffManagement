@@ -13,6 +13,4 @@ public class RequestDTO {
     private String email;
     private String contactNumber;
     private Long departmentId;
-    private BigDecimal amount;
-    private Currency currency;
 }

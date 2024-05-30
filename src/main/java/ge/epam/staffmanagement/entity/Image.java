@@ -20,7 +20,7 @@ public class Image {
 
     @OneToOne
     @JoinColumn(name = "staff_id")
-    @JsonIgnoreProperties("image") //chaxvevis sawinag
+    @JsonIgnoreProperties("image")
     private Staff staff;
 
 }

@@ -7,11 +7,13 @@ import ge.epam.staffmanagement.model.RequestDTO;
 import ge.epam.staffmanagement.service.DepartmentService;
 import ge.epam.staffmanagement.service.StaffService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.io.IOException;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/staff")
@@ -29,8 +31,12 @@ public class StaffController {
     }
 
     @GetMapping
-    public List<Staff> getAllStaff() {
-        return staffService.findAll();
+    public Page<Staff> getStaff(
+            @RequestParam(defaultValue = "") String query,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return staffService.searchStaff(query, pageable);
     }
 
     @GetMapping("/{id}")
@@ -67,7 +73,7 @@ public class StaffController {
         staffDetails.setEmail(requestDto.getEmail());
         staffDetails.setContactNumber(requestDto.getContactNumber());
         staffDetails.setDepartment(departmentService.getDepartmentById(requestDto.getDepartmentId()));
-        if(image!=null) {
+        if (image != null) {
             Image img = new Image();
             img.setName(image.getOriginalFilename());
             img.setData(image.getBytes());

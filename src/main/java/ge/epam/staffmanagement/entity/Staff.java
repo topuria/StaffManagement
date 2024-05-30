@@ -22,8 +22,6 @@ public class Staff {
 
     private String contactNumber;
 
-    //private Double salary;
-
     @ManyToOne
     @JoinColumn(name = "department_id")
     @JsonIgnoreProperties("staff") // Ignore staff property to break the infinite loop

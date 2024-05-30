@@ -6,6 +6,8 @@ import ge.epam.staffmanagement.exception.ResourceNotFoundException;
 import ge.epam.staffmanagement.repository.StaffRepository;
 import ge.epam.staffmanagement.service.StaffService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -45,7 +47,7 @@ public class StaffServiceImpl implements StaffService {
         staff.setEmail(staffDetails.getEmail());
         staff.setDepartment(staffDetails.getDepartment());
         staff.setContactNumber(staffDetails.getContactNumber());
-        if(staffDetails.getImage() != null) {
+        if (staffDetails.getImage() != null) {
             Image image = staff.getImage();
             image.setData(staffDetails.getImage().getData());
             image.setName(staffDetails.getImage().getName());
@@ -58,5 +60,10 @@ public class StaffServiceImpl implements StaffService {
     public void deleteStaff(long id) {
         Staff staff = staffRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Staff not found with id " + id));
         staffRepository.delete(staff);
+    }
+
+    @Override
+    public Page<Staff> searchStaff(String query, Pageable pageable) {
+        return staffRepository.searchStaff(query, pageable);
     }
 }

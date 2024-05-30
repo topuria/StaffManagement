@@ -10,20 +10,24 @@ document.addEventListener('DOMContentLoaded', function () {
     const nextPageBtn = document.getElementById('nextPageBtn');
     const currentPageSpan = document.getElementById('currentPage');
     let currentStaffId = null;
-    let currentPage = 0;  // Pagination is zero-indexed
+    let currentPage = 0;
     const pageSize = 10;
 
-    // Function to get the JWT token from local storage
+    // Functions to get the JWT token from local storage
     function getAccessToken() {
         return localStorage.getItem('accessToken');
+    }
+
+    function saveAccessToken(token) {
+        localStorage.setItem('accessToken', token);
     }
 
     function getRefreshToken() {
         return localStorage.getItem('refreshToken');
     }
 
-    function saveAccessToken(token) {
-        localStorage.setItem('accessToken', token);
+    function saveRefreshToken(token) {
+        localStorage.setItem('refreshToken', token);
     }
 
     function fetchWithToken(url, options) {
@@ -59,6 +63,7 @@ document.addEventListener('DOMContentLoaded', function () {
             })
             .then(data => {
                 saveAccessToken(data.accessToken);
+                saveRefreshToken(data.accessToken)
                 return data.accessToken;
             });
     }
@@ -83,12 +88,25 @@ document.addEventListener('DOMContentLoaded', function () {
                 staffTable.innerHTML = '';
                 data.content.forEach(staff => {
                     const row = staffTable.insertRow();
-                    row.insertCell(0).textContent = staff.firstName;
-                    row.insertCell(1).textContent = staff.lastName;
-                    row.insertCell(2).textContent = staff.email;
-                    row.insertCell(3).textContent = staff.contactNumber;
-                    row.insertCell(4).textContent = staff.department.name;
-                    const actionsCell = row.insertCell(5);
+
+                    const imgCell = row.insertCell(0);
+                    if (staff.image && staff.image.name && staff.image.name !== "" && staff.image.data && staff.image.data.length > 0) {
+                        const img = document.createElement('img');
+                        img.src = `data:image/jpeg;base64,${staff.image.data}`;
+                        img.alt = `${staff.firstName} ${staff.lastName}`;
+                        img.style.width = '50px';
+                        img.style.height = '50px';
+                        imgCell.appendChild(img);
+                        img.addEventListener('click', () => {
+                            toggleImageSize(img);
+                        });
+                    }
+                    row.insertCell(1).textContent = staff.firstName;
+                    row.insertCell(2).textContent = staff.lastName;
+                    row.insertCell(3).textContent = staff.email;
+                    row.insertCell(4).textContent = staff.contactNumber;
+                    row.insertCell(5).textContent = staff.department.name;
+                    const actionsCell = row.insertCell(6);
                     const editButton = document.createElement('button');
                     editButton.textContent = 'Edit';
                     editButton.classList.add('btn', 'btn-edit');
@@ -108,6 +126,16 @@ document.addEventListener('DOMContentLoaded', function () {
                 updatePagination(data);
             })
             .catch(error => console.error('Error fetching staff members:', error));
+    }
+
+    function toggleImageSize(img) {
+        if (img.style.width === '50px') {
+            img.style.width = '200px';
+            img.style.height = 'auto';
+        } else {
+            img.style.width = '50px';
+            img.style.height = '50px';
+        }
     }
 
     function updatePagination(data) {
@@ -190,12 +218,64 @@ document.addEventListener('DOMContentLoaded', function () {
         const form = document.getElementById('staffForm');
         const formData = new FormData(form);
 
+        const firstName = formData.get('firstName');
+        const lastName = formData.get('lastName');
+        const email = formData.get('email');
+        const contactNumber = formData.get('contactNumber');
+        const departmentId = formData.get('departmentId');
+        const image = formData.get('image');
+        const namePattern = /^[a-zA-Z]+$/;
+        const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+
+        if (firstName.trim() === '') {
+            alert('First Name is required.');
+            return;
+        }
+
+        if (!namePattern.test(firstName)) {
+            alert('First Name must contain only alphabet characters.');
+            return;
+        }
+
+        if (lastName.trim() === '') {
+            alert('Last Name is required.');
+            return;
+        }
+
+        if (!namePattern.test(lastName)) {
+            alert('Last Name must contain only alphabet characters.');
+            return;
+        }
+
+
+        if (!emailPattern.test(email)) {
+            alert('Please enter a valid email address.');
+            return;
+        }
+
+        if (contactNumber.trim() === '') {
+            alert('Contact Number is required.');
+            return;
+        }
+
+        if (departmentId === '') {
+            alert('Please select a department.');
+            return;
+        }
+
+        if (currentStaffId) {
+            if (image && !['image/jpeg', 'image/png', 'image/gif'].includes(image.type)) {
+                alert('Please upload a valid image file (jpg, png, gif).');
+                return;
+            }
+        }
+
         const staffData = {
-            firstName: formData.get('firstName'),
-            lastName: formData.get('lastName'),
-            email: formData.get('email'),
-            contactNumber: formData.get('contactNumber'),
-            departmentId: formData.get('departmentId')
+            firstName: firstName,
+            lastName: lastName,
+            email: email,
+            contactNumber: contactNumber,
+            departmentId: departmentId
         };
 
         formData.append('requestDto', new Blob([JSON.stringify(staffData)], {type: 'application/json'}));
@@ -205,7 +285,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         fetchWithToken(url, {
             method: method,
-            body: formData // Do not set Content-Type header; let browser set it as multipart/form-data
+            body: formData
         })
             .then(response => {
                 if (response.ok) {
@@ -262,7 +342,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Close the modal if the user clicks outside of it
     window.onclick = function (event) {
-        if (event.target == modal) {
+        if (event.target === modal) {
             modal.style.display = 'none';
         }
     }

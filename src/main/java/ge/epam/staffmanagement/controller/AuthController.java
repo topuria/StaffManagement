@@ -4,6 +4,7 @@ import ge.epam.staffmanagement.config.JwtUtil;
 import ge.epam.staffmanagement.entity.User;
 import ge.epam.staffmanagement.service.impl.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -36,7 +37,17 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@RequestBody User user) {
+    public ResponseEntity<String> registerUser(@RequestBody User user) {
+        String username = user.getUsername();
+        String password = user.getPassword();
+
+        if (username == null || username.length() < 5) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Username must be at least 5 characters long.");
+        }
+        if (password == null || password.length() < 8) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Password must be at least 8 characters long.");
+        }
+
         userDetailsService.saveUser(user);
         return ResponseEntity.ok("User registered successfully");
     }
@@ -69,9 +80,11 @@ public class AuthController {
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
         String newAccessToken = jwtUtil.createToken(new HashMap<>(), userDetails.getUsername(), JwtUtil.ACCESS_TOKEN_VALIDITY);
+        String newRefreshToken = jwtUtil.createToken(new HashMap<>(), userDetails.getUsername(), JwtUtil.REFRESH_TOKEN_VALIDITY);
 
         Map<String, String> response = new HashMap<>();
         response.put("accessToken", newAccessToken);
+        response.put("refreshToken", newRefreshToken);
 
         return ResponseEntity.ok(response);
     }

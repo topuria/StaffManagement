@@ -4,6 +4,18 @@ document.getElementById('registerForm').addEventListener('submit', function (e) 
     const username = document.getElementById('username').value;
     const password = document.getElementById('password').value;
 
+    if (username.length < 5) {
+        alert('Username must be at least 5 characters long.');
+        e.preventDefault();
+        return;
+    }
+
+    if (password.length < 8) {
+        alert('Password must be at least 8 characters long.');
+        e.preventDefault();
+        return;
+    }
+
     fetch('/register', {
         method: 'POST',
         headers: {
